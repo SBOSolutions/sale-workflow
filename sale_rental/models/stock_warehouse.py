@@ -117,12 +117,11 @@ class StockWarehouse(models.Model):
             "warehouse_id": self.id,
             "company_id": self.company_id.id,
         }
-        res = [
+        return [
             rental_pull_rule,
             rental_push_rule,
             sell_rented_product_pull_rule,
         ]
-        return res
 
     def _create_rental_locations(self):
         slo = self.env["stock.location"]
@@ -212,13 +211,16 @@ class StockWarehouse(models.Model):
                         "sell_rented_product_route_id": sell_rented_route.id,
                     }
                 )
-                rental_rules = self.env["stock.rule"].search(
+                if rental_rules := self.env["stock.rule"].search(
                     [
-                        ("route_id", "in", [rental_route.id, sell_rented_route.id]),
+                        (
+                            "route_id",
+                            "in",
+                            [rental_route.id, sell_rented_route.id],
+                        ),
                         ("active", "=", False),
                     ]
-                )
-                if rental_rules:
+                ):
                     rental_rules.write({"active": True})
                 else:
                     for rule_vals in self._get_rental_push_pull_rules():

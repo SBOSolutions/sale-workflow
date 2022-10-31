@@ -5,7 +5,7 @@ from odoo import SUPERUSER_ID, api
 
 def __find_origin_moves(moves):
     all_moves = moves
-    for move in moves:
+    for move in all_moves:
         if move.move_orig_ids:
             all_moves |= __find_origin_moves(move.move_orig_ids)
     return all_moves

@@ -26,13 +26,12 @@ class TestAutomaticWorkflowInvoiceDefaultValues(TestCommon, TestAutomaticWorkflo
         else:
             invoice_default_values = []
 
-        workflow_values = {
+        return {
             "validate_invoice": False,
             "create_invoice_default_value_ids": [
                 (0, 0, values) for values in invoice_default_values
             ],
         }
-        return workflow_values
 
     def _test_common_and_return_invoice(self, with_default_values):
         workflow_override = self._get_override_workflow_values(

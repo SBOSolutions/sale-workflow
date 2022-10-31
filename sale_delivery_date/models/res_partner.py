@@ -84,7 +84,7 @@ class ResPartner(models.Model):
         :param to_datetime: Datetime object
         :return: List of Datetime objects
         """
-        res = list()
+        res = []
         for this_datetime in date_range(from_datetime, to_datetime, timedelta(days=1)):
             this_weekday_number = this_datetime.weekday()
             this_weekday = self.env["time.weekday"].search(

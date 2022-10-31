@@ -24,8 +24,7 @@ class TestAutomaticWorkflowPaymentMode(TestCommon, TestAutomaticWorkflowMixin):
         )
 
     def create_sale_order(self, workflow, override=None):
-        new_order = super().create_sale_order(workflow, override)
-        return new_order
+        return super().create_sale_order(workflow, override)
 
     def create_full_automatic(self, override=None):
         workflow = super().create_full_automatic(override)

@@ -36,15 +36,13 @@ class AccountMove(models.Model):
                 record.sale_type_id = self.env["sale.order.type"].search(
                     [("company_id", "in", [self.env.company.id, False])], limit=1
                 )
-            else:
-                sale_type = (
-                    record.partner_id.with_company(record.company_id).sale_type
-                    or record.partner_id.commercial_partner_id.with_company(
-                        record.company_id
-                    ).sale_type
-                )
-                if sale_type:
-                    record.sale_type_id = sale_type
+            elif sale_type := (
+                record.partner_id.with_company(record.company_id).sale_type
+                or record.partner_id.commercial_partner_id.with_company(
+                    record.company_id
+                ).sale_type
+            ):
+                record.sale_type_id = sale_type
 
     @api.onchange("sale_type_id")
     def onchange_sale_type_id(self):

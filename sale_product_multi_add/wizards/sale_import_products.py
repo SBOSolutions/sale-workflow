@@ -45,18 +45,14 @@ class SaleImportProducts(models.TransientModel):
             }
         )
         sale_line.product_id_change()
-        line_values = sale_line._convert_to_write(sale_line._cache)
-        return line_values
+        return sale_line._convert_to_write(sale_line._cache)
 
     def select_products(self):
         so_obj = self.env["sale.order"]
         for wizard in self:
-            sale = so_obj.browse(self.env.context.get("active_id", False))
-
-            if sale:
+            if sale := so_obj.browse(self.env.context.get("active_id", False)):
                 for item in wizard.items:
-                    vals = self._get_line_values(sale, item)
-                    if vals:
+                    if vals := self._get_line_values(sale, item):
                         self.env["sale.order.line"].create(vals)
 
         return {"type": "ir.actions.act_window_close"}

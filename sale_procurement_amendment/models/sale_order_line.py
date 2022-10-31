@@ -79,10 +79,12 @@ class SaleOrderLine(models.Model):
             qty = 0.0
             for proc in line.move_ids.filtered(lambda p: p.state != "cancel"):
                 qty += proc.product_qty
-            if float_compare(qty, line.product_uom_qty, precision_digits=precision) < 0:
-                line.to_be_procured = True
-            else:
-                line.to_be_procured = False
+            line.to_be_procured = (
+                float_compare(
+                    qty, line.product_uom_qty, precision_digits=precision
+                )
+                < 0
+            )
 
     def _amend_and_reprocure(self):
         """

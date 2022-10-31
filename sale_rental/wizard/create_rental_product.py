@@ -79,7 +79,7 @@ class CreateRentalProduct(models.TransientModel):
         pp_obj = self.env["product.product"]
         #  check that a rental product doesn't already exists ?
         product = pp_obj.create(self._prepare_rental_product())
-        action = {
+        return {
             "name": pp_obj._description,
             "type": "ir.actions.act_window",
             "res_model": pp_obj._name,
@@ -88,4 +88,3 @@ class CreateRentalProduct(models.TransientModel):
             "target": "current",
             "res_id": product.id,
         }
-        return action

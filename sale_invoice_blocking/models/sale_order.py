@@ -31,7 +31,7 @@ class SaleOrder(models.Model):
     @api.model
     def _nothing_to_invoice_error(self):
         error = super()._nothing_to_invoice_error()
-        msg = [x for x in error.args]
+        msg = list(error.args)
 
         msg.append(
             _(

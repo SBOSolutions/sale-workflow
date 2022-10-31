@@ -24,13 +24,8 @@ class SaleRental(models.Model):
     def name_get(self):
         res = []
         for rental in self:
-            name = "[%s] %s - %s > %s (%s)" % (
-                rental.partner_id.display_name,
-                rental.rented_product_id.display_name,
-                rental.start_date,
-                rental.end_date,
-                rental._fields["state"].convert_to_export(rental.state, rental),
-            )
+            name = f'[{rental.partner_id.display_name}] {rental.rented_product_id.display_name} - {rental.start_date} > {rental.end_date} ({rental._fields["state"].convert_to_export(rental.state, rental)})'
+
             res.append((rental.id, name))
         return res
 

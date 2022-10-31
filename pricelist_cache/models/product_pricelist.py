@@ -31,8 +31,7 @@ class Pricelist(models.Model):
         products = self.env["product.product"].search([("id", "in", product_ids)])
         products_qty_partner = [(p, 1, False) for p in products]
         results = self._compute_price_rule(products_qty_partner, date.today())
-        product_prices = {prod: price[0] for prod, price in results.items()}
-        return product_prices
+        return {prod: price[0] for prod, price in results.items()}
 
     def _get_root_pricelist_ids(self):
         """Returns the id of all root pricelists.
@@ -129,7 +128,7 @@ class Pricelist(models.Model):
         on it.
         """
         self.ensure_one()
-        return bool(not self._get_parent_pricelists())
+        return not self._get_parent_pricelists()
 
     def _recursive_get_items(self, product):
         """Recursively searches on parent pricelists for items applied on product."""

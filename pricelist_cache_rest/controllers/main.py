@@ -46,8 +46,7 @@ class PricelistController(http.Controller):
         return partner._pricelist_cache_get_prices()
 
     def _make_json_response(self, data):
-        headers = {}
-        headers["Content-Type"] = "application/json"
+        headers = {"Content-Type": "application/json"}
         return http.request.make_response(json.dumps(data), headers=headers)
 
     def _cache_to_json(self, cache_items):

@@ -119,10 +119,11 @@ class AutomaticWorkflowJob(models.Model):
 
     def _prepare_dict_account_payment(self, invoice):
         partner_type = (
-            invoice.move_type in ("out_invoice", "out_refund")
-            and "customer"
-            or "supplier"
+            "customer"
+            if invoice.move_type in ("out_invoice", "out_refund")
+            else "supplier"
         )
+
         return {
             "reconciled_invoice_ids": [(6, 0, invoice.ids)],
             "amount": invoice.amount_residual,

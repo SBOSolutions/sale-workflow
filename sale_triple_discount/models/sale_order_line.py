@@ -25,7 +25,7 @@ class SaleOrderLine(models.Model):
 
     def _additive_discount(self):
         self.ensure_one()
-        discount = sum([getattr(self, x) or 0.0 for x in self._discount_fields()])
+        discount = sum(getattr(self, x) or 0.0 for x in self._discount_fields())
         if discount <= 0:
             return 0
         elif discount >= 100:
@@ -108,7 +108,7 @@ class SaleOrderLine(models.Model):
         Resetting discount2 and discount3 to 0.0 avoids issues if
         this method is called multiple times.
         Updating the cache provides consistency through recomputations."""
-        prev_values = dict()
+        prev_values = {}
         self.invalidate_cache(
             fnames=["discount", "discount2", "discount3"], ids=self.ids
         )

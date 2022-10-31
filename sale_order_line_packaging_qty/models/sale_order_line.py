@@ -85,10 +85,13 @@ class SaleOrderLine(models.Model):
         if self.product_packaging:
             pack_qty = 1
             product_qty = self.product_packaging.qty
-            if self.product_uom_qty > 0 and product_qty > 0:
-                if (self.product_uom_qty % self.product_packaging.qty) == 0:
-                    pack_qty = self.product_uom_qty / self.product_packaging.qty
-                    product_qty = self.product_uom_qty
+            if (
+                self.product_uom_qty > 0
+                and product_qty > 0
+                and (self.product_uom_qty % self.product_packaging.qty) == 0
+            ):
+                pack_qty = self.product_uom_qty / self.product_packaging.qty
+                product_qty = self.product_uom_qty
             self.update(
                 {
                     "product_packaging_qty": pack_qty,
@@ -106,8 +109,4 @@ class SaleOrderLine(models.Model):
         Ensure a warning is raised when changing the package if the qty
         is not a multiple of the package qty.
         """
-        # TODO Drop once https://github.com/odoo/odoo/pull/49150/ is merged
-        res = super()._onchange_product_uom_qty()
-        if not res:
-            res = self._check_package()
-        return res
+        return super()._onchange_product_uom_qty() or self._check_package()

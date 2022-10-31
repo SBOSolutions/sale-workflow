@@ -52,15 +52,13 @@ class SaleOrder(models.Model):
                 record.type_id = self.env["sale.order.type"].search(
                     [("company_id", "in", [self.env.company.id, False])], limit=1
                 )
-            else:
-                sale_type = (
-                    record.partner_id.with_company(record.company_id).sale_type
-                    or record.partner_id.commercial_partner_id.with_company(
-                        record.company_id
-                    ).sale_type
-                )
-                if sale_type:
-                    record.type_id = sale_type
+            elif sale_type := (
+                record.partner_id.with_company(record.company_id).sale_type
+                or record.partner_id.commercial_partner_id.with_company(
+                    record.company_id
+                ).sale_type
+            ):
+                record.type_id = sale_type
 
     @api.onchange("type_id")
     def onchange_type_id(self):
@@ -71,31 +69,26 @@ class SaleOrder(models.Model):
             # Order values
             vals = {}
             if order_type.warehouse_id:
-                vals.update({"warehouse_id": order_type.warehouse_id})
+                vals["warehouse_id"] = order_type.warehouse_id
             if order_type.picking_policy:
-                vals.update({"picking_policy": order_type.picking_policy})
+                vals["picking_policy"] = order_type.picking_policy
             if order_type.payment_term_id:
-                vals.update({"payment_term_id": order_type.payment_term_id})
+                vals["payment_term_id"] = order_type.payment_term_id
             if order_type.pricelist_id:
-                vals.update({"pricelist_id": order_type.pricelist_id})
+                vals["pricelist_id"] = order_type.pricelist_id
             if order_type.incoterm_id:
-                vals.update({"incoterm": order_type.incoterm_id})
+                vals["incoterm"] = order_type.incoterm_id
             if order_type.analytic_account_id:
-                vals.update({"analytic_account_id": order_type.analytic_account_id})
+                vals["analytic_account_id"] = order_type.analytic_account_id
             if order_type.quotation_validity_days:
-                vals.update(
-                    {
-                        "validity_date": fields.Date.to_string(
-                            datetime.now()
-                            + timedelta(order_type.quotation_validity_days)
-                        )
-                    }
+                vals["validity_date"] = fields.Date.to_string(
+                    datetime.now() + timedelta(order_type.quotation_validity_days)
                 )
+
             if vals:
                 order.update(vals)
             # Order line values
-            line_vals = {}
-            line_vals.update({"route_id": order_type.route_id.id})
+            line_vals = {"route_id": order_type.route_id.id}
             order.order_line.update(line_vals)
 
     @api.model

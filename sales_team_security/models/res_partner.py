@@ -30,8 +30,7 @@ class ResPartner(models.Model):
         )
         if view_type == "form":
             eview = etree.fromstring(res["arch"])
-            xml_fields = eview.xpath("//field[@name='child_ids']")
-            if xml_fields:
+            if xml_fields := eview.xpath("//field[@name='child_ids']"):
                 context_str = (
                     xml_fields[0]
                     .get("context", "{}")

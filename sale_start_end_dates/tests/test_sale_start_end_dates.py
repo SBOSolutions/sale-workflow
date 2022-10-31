@@ -63,7 +63,7 @@ class TestSaleStartEndDates(TransactionCase):
         self.so.default_end_date_change()
 
     def test_start_end_dates_product_id_change(self):
-        if self.so.default_end_date and self.so.default_end_date:
+        if self.so.default_end_date:
             self.so.order_line.start_end_dates_product_id_change()
             self.so.order_line.start_date_change()
             self.so.order_line.end_date_change()

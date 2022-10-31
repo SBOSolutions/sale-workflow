@@ -77,8 +77,7 @@ class SaleOrderLine(models.Model):
     @api.onchange("product_uom_qty")
     def _onchange_product_uom_qty(self):
         self._force_qty_with_package()
-        res = super()._onchange_product_uom_qty()
-        return res
+        return super()._onchange_product_uom_qty()
 
     def _get_product_packaging_having_multiple_qty(self, product, qty, uom):
         if uom != product.uom_id:
@@ -135,13 +134,12 @@ class SaleOrderLine(models.Model):
             # The simple way to handle that is to not modify product_packaging
             # if one is already set.
             if not self.product_packaging:
-                packaging = self._get_product_packaging_having_multiple_qty(
+                if packaging := self._get_product_packaging_having_multiple_qty(
                     product, quantity, uom
-                )
-                if packaging:
+                ):
                     return {"product_packaging": packaging.id}
-            # No need to raise an error here if no packaging has been found
-            #  since the error on _check_product_packaging will be raised
+                # No need to raise an error here if no packaging has been found
+                #  since the error on _check_product_packaging will be raised
         return {}
 
     @api.model
@@ -162,11 +160,10 @@ class SaleOrderLine(models.Model):
         if product and product.sell_only_by_packaging:
             quantity = vals.get("product_uom_qty")
             uom = self.env["uom.uom"].browse(vals.get("product_uom"))
-            packaging = self._get_product_packaging_having_multiple_qty(
+            if packaging := self._get_product_packaging_having_multiple_qty(
                 product, quantity, uom
-            )
-            if packaging:
+            ):
                 return {"product_packaging": packaging.id}
-            # No need to raise an error here if no packaging has been found
-            #  since the error on _check_product_packaging will be raised
+                # No need to raise an error here if no packaging has been found
+                #  since the error on _check_product_packaging will be raised
         return {}

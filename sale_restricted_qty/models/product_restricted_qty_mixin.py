@@ -98,14 +98,13 @@ class ProductMinMultipleMixin(models.AbstractModel):
 
     def _get_sale_restricted_qty(self):
         self.ensure_one()
-        res = {
+        return {
             "sale_min_qty": self.manual_sale_min_qty,
             "force_sale_min_qty": self.manual_force_sale_min_qty == "force",
             "sale_max_qty": self.manual_sale_max_qty,
             "force_sale_max_qty": self.manual_force_sale_max_qty == "force",
             "sale_multiple_qty": self.manual_sale_multiple_qty,
         }
-        return res
 
     @api.depends(
         "manual_force_sale_min_qty",

@@ -8,8 +8,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
 
     def _create_invoice(self, order, so_line, amount):
         invoice = super()._create_invoice(order, so_line, amount)
-        invoice_plan_id = self._context.get("invoice_plan_id")
-        if invoice_plan_id:
+        if invoice_plan_id := self._context.get("invoice_plan_id"):
             plan = self.env["sale.invoice.plan"].browse(invoice_plan_id)
             plan.invoice_move_ids += invoice
         return invoice

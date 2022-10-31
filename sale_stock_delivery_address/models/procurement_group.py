@@ -12,8 +12,7 @@ class ProcurementGroup(models.Model):
         new_procs = []
         Proc = self.env["procurement.group"].Procurement
         for procurement in procurements:
-            sale_line_id = procurement.values.get("sale_line_id")
-            if sale_line_id:
+            if sale_line_id := procurement.values.get("sale_line_id"):
                 sale_line = self.env["sale.order.line"].browse(sale_line_id)
                 if sale_line.dest_address_id:
                     procurement.values["partner_id"] = sale_line.dest_address_id.id

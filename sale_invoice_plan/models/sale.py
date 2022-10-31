@@ -31,23 +31,31 @@ class SaleOrder(models.Model):
         for rec in self:
             has_invoice_plan = rec.use_invoice_plan and rec.invoice_plan_ids
             to_invoice = rec.invoice_plan_ids.filtered(lambda l: not l.invoiced)
-            if rec.state == "sale" and has_invoice_plan and to_invoice:
-                if rec.invoice_status == "to invoice" or (
-                    rec.invoice_status == "no"
-                    and "advance" in to_invoice.mapped("invoice_type")
-                ):
-                    rec.ip_invoice_plan = True
-                    continue
+            if (
+                rec.state == "sale"
+                and has_invoice_plan
+                and to_invoice
+                and (
+                    rec.invoice_status == "to invoice"
+                    or (
+                        rec.invoice_status == "no"
+                        and "advance" in to_invoice.mapped("invoice_type")
+                    )
+                )
+            ):
+                rec.ip_invoice_plan = True
+                continue
             rec.ip_invoice_plan = False
 
     @api.constrains("state")
     def _check_invoice_plan(self):
         for rec in self:
-            if rec.state != "draft":
-                if rec.invoice_plan_ids.filtered(lambda l: not l.percent):
-                    raise ValidationError(
-                        _("Please fill percentage for all invoice plan lines")
-                    )
+            if rec.state != "draft" and rec.invoice_plan_ids.filtered(
+                lambda l: not l.percent
+            ):
+                raise ValidationError(
+                    _("Please fill percentage for all invoice plan lines")
+                )
 
     def action_confirm(self):
         if self.filtered(lambda r: r.use_invoice_plan and not r.invoice_plan_ids):
@@ -113,8 +121,7 @@ class SaleOrder(models.Model):
 
     def _create_invoices(self, grouped=False, final=False, date=None):
         moves = super()._create_invoices(grouped=grouped, final=final, date=date)
-        invoice_plan_id = self._context.get("invoice_plan_id")
-        if invoice_plan_id:
+        if invoice_plan_id := self._context.get("invoice_plan_id"):
             plan = self.env["sale.invoice.plan"].browse(invoice_plan_id)
             for move in moves:
                 plan._compute_new_invoice_quantity(move)

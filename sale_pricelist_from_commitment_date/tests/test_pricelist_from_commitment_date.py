@@ -61,9 +61,7 @@ class PricelistFromCommitmentDate(SavepointCase):
         return cls.env["product.pricelist.item"].create(values)
 
     def _import_file_and_check_price_unit(self, file_vals):
-        file = "{}\r\n{}".format(
-            ",".join(file_vals.keys()), ",".join(file_vals.values())
-        )
+        file = f'{",".join(file_vals.keys())}\r\n{",".join(file_vals.values())}'
         # Create the importer and run it
         res = (
             self.env["base_import.import"]

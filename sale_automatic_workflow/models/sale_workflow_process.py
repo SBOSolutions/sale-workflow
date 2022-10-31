@@ -22,8 +22,7 @@ class SaleWorkflowProcess(models.Model):
 
     @api.model
     def _default_filter(self, xmlid):
-        record = self.env.ref(xmlid, raise_if_not_found=False)
-        if record:
+        if record := self.env.ref(xmlid, raise_if_not_found=False):
             return record
         return self.env["ir.filters"].browse()
 

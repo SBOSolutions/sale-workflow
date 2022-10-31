@@ -29,5 +29,4 @@ class TestSaleValidity(TransactionCase):
                 )
             ],
         }
-        so = self.env["sale.order"].create(vals)
-        return so
+        return self.env["sale.order"].create(vals)

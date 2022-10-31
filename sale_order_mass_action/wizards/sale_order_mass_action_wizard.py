@@ -24,7 +24,7 @@ class SaleOrderMassActionWizard(models.TransientModel):
     @api.model
     def _notify_success(self, sale_orders):
         order_names = "\n".join(sale_orders.mapped("name"))
-        message = "The following orders has been updated : %s" % order_names
+        message = f"The following orders has been updated : {order_names}"
         self.env.user.notify_success(message=message)
 
     def apply_button(self):

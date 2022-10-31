@@ -38,8 +38,8 @@ class ProductSet(models.Model):
     def _name_get(self):
         parts = []
         if self.ref:
-            parts.append("[%s]" % self.ref)
+            parts.append(f"[{self.ref}]")
         parts.append(self.name)
         if self.partner_id:
-            parts.append("@ %s" % self.partner_id.name)
+            parts.append(f"@ {self.partner_id.name}")
         return " ".join(parts)

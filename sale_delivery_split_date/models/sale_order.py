@@ -12,7 +12,6 @@ class SaleOrder(models.Model):
     @api.model
     def _prepare_procurement_group_by_line(self, line):
         vals = super(SaleOrder, self)._prepare_procurement_group_by_line(line)
-        if line._get_procurement_group_key()[0] == 24:
-            if line.commitment_date:
-                vals["name"] += "/" + format_date(line.env, line.commitment_date.date())
+        if line._get_procurement_group_key()[0] == 24 and line.commitment_date:
+            vals["name"] += f"/{format_date(line.env, line.commitment_date.date())}"
         return vals

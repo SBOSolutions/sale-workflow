@@ -27,14 +27,13 @@ class SaleOrderLine(models.Model):
         date_planned = res.get("date_planned")
         if not date_planned:
             return res
-        new_date_planned = self._prepare_procurement_values_cutoff_time(
+        if new_date_planned := self._prepare_procurement_values_cutoff_time(
             fields.Datetime.to_datetime(date_planned),
             # if we have a commitment date, even if we are too late, respect
             # the original planned date (but change the time), the transfer
             # will be considered as "late"
             keep_same_day=bool(self.order_id.commitment_date),
-        )
-        if new_date_planned:
+        ):
             res["date_planned"] = new_date_planned
         return res
 
@@ -58,10 +57,9 @@ class SaleOrderLine(models.Model):
         date_planned = res.get("date_planned")
         if not date_planned:
             return res
-        new_date_planned = self._prepare_procurement_values_time_windows(
+        if new_date_planned := self._prepare_procurement_values_time_windows(
             fields.Datetime.to_datetime(date_planned)
-        )
-        if new_date_planned:
+        ):
             res["date_planned"] = new_date_planned
         return res
 
@@ -104,15 +102,12 @@ class SaleOrderLine(models.Model):
                 date_planned,
                 next_preferred_date_with_sec_lead,
             )
-            # if we have a new datetime proposed by a delivery time window,
-            # apply the warehouse/partner cutoff time
-            cutoff_datetime = self._prepare_procurement_values_cutoff_time(
+            if cutoff_datetime := self._prepare_procurement_values_cutoff_time(
                 next_preferred_date_with_sec_lead,
                 # the correct day has already been computed, only change
                 # the cut-off time
                 keep_same_day=True,
-            )
-            if cutoff_datetime:
+            ):
                 return cutoff_datetime
             return next_preferred_date_with_sec_lead
         else:
@@ -144,8 +139,7 @@ class SaleOrderLine(models.Model):
         return expected_date
 
     def _warehouse_calendar_expected_date(self, expected_date):
-        calendar = self.order_id.warehouse_id.calendar_id
-        if calendar:
+        if calendar := self.order_id.warehouse_id.calendar_id:
             customer_lead, security_lead, workload = self._get_delays()
             td_customer_lead = timedelta(days=customer_lead)
             td_security_lead = timedelta(days=security_lead)
@@ -223,13 +217,14 @@ class SaleOrderLine(models.Model):
 
     def _cutoff_time_delivery_expected_date(self, expected_date):
         cutoff = self.order_id.get_cutoff_time()
-        if not cutoff:
-            return expected_date
-        return self._get_utc_cutoff_datetime(cutoff, expected_date)
+        return (
+            self._get_utc_cutoff_datetime(cutoff, expected_date)
+            if cutoff
+            else expected_date
+        )
 
     def _get_utc_cutoff_datetime(self, cutoff, date, keep_same_day=False):
-        tz = cutoff.get("tz")
-        if tz:
+        if tz := cutoff.get("tz"):
             cutoff_time = time(hour=cutoff.get("hour"), minute=cutoff.get("minute"))
             # Convert here to naive datetime in UTC
             tz_loc = pytz.timezone(tz)
@@ -242,10 +237,8 @@ class SaleOrderLine(models.Model):
             utc_cutoff_datetime = date.replace(
                 hour=cutoff.get("hour"), minute=cutoff.get("minute"), second=0
             )
-        if date <= utc_cutoff_datetime or keep_same_day:
-            # Postpone delivery to today's cutoff
-            new_date = utc_cutoff_datetime
-        else:
-            # Postpone delivery to tomorrow's cutoff
-            new_date = utc_cutoff_datetime + timedelta(days=1)
-        return new_date
+        return (
+            utc_cutoff_datetime
+            if date <= utc_cutoff_datetime or keep_same_day
+            else utc_cutoff_datetime + timedelta(days=1)
+        )

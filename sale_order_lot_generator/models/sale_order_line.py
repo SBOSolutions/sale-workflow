@@ -42,7 +42,7 @@ class SaleOrderLine(models.Model):
             )
             for lot in lot_ids:
                 lot_name = lot.name
-                index_str = lot_name.replace(line.order_id.name + "-", "")
+                index_str = lot_name.replace(f"{line.order_id.name}-", "")
                 last_index = int(index_str) if index_str.isdigit() else 0
                 index_lot = max(index_lot, last_index)
             index_lot += 1

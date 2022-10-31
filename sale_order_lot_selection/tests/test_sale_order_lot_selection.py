@@ -60,7 +60,7 @@ class TestSaleOrderLotSelection(test_common.SingleTransactionCase):
     def _inventory_products(self, product, lot, qty):
         inventory = self.env["stock.inventory"].create(
             {
-                "name": "%s inventory" % product.name,
+                "name": f"{product.name} inventory",
                 "product_ids": product.ids,
                 "state": "confirm",
                 "line_ids": [
@@ -78,6 +78,7 @@ class TestSaleOrderLotSelection(test_common.SingleTransactionCase):
                 ],
             }
         )
+
         inventory.action_validate()
 
     def test_several_lines_with_same_lot(self):

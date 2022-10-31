@@ -66,8 +66,7 @@ class TestSaleDeliveryBlock(common.TransactionCase):
 
     def _picking_comp(self, so):
         """count created pickings"""
-        count = len(so.picking_ids)
-        return count
+        return len(so.picking_ids)
 
     def test_no_block(self):
         """Tests if normal behaviour without block."""

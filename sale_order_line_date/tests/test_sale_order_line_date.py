@@ -48,7 +48,7 @@ class TestSaleOrderLineDates(TransactionCase):
         )
 
     def _create_sale_order(self, customer, date):
-        sale = self.env["sale.order"].create(
+        return self.env["sale.order"].create(
             {
                 "partner_id": customer.id,
                 "partner_invoice_id": customer.id,
@@ -57,10 +57,9 @@ class TestSaleOrderLineDates(TransactionCase):
                 "commitment_date": date,
             }
         )
-        return sale
 
     def _create_sale_order_line(self, sale, product, qty, price, date):
-        sale_line = self.env["sale.order.line"].create(
+        return self.env["sale.order.line"].create(
             {
                 "product_id": product.id,
                 "name": "cool product",
@@ -70,7 +69,6 @@ class TestSaleOrderLineDates(TransactionCase):
                 "commitment_date": date,
             }
         )
-        return sale_line
 
     def _assert_equal_dates(self, date1, date2):
         if isinstance(date1, datetime.datetime):

@@ -22,8 +22,8 @@ class TestProductSet(common.SavepointCase):
             "product_set_id": self.product_set.id,
             "order_id": self.so.id,
             "quantity": 2,
-        }
-        vals.update(kw)
+        } | kw
+
         return self.product_set_add.with_context(**ctx or {}).create(vals)
 
     def test_add_set_lines_init(self):
@@ -62,9 +62,7 @@ class TestProductSet(common.SavepointCase):
             order_line.ensure_one()
             self.assertEqual(order_line.product_uom_qty, line.quantity * wiz.quantity)
 
-        sequence = {}
-        for line in so.order_line:
-            sequence[line.product_id.id] = line.sequence
+        sequence = {line.product_id.id: line.sequence for line in so.order_line}
         # make sure sale order line sequence keep sequence set on set
         seq_line1 = sequence.pop(
             self.env.ref("sale_product_set.product_set_line_computer_4").product_id.id
@@ -76,7 +74,7 @@ class TestProductSet(common.SavepointCase):
             self.env.ref("sale_product_set.product_set_line_computer_3").product_id.id
         )
         self.assertTrue(
-            max([v for k, v in sequence.items()]) < seq_line1 < seq_line2 < seq_line3
+            max(v for k, v in sequence.items()) < seq_line1 < seq_line2 < seq_line3
         )
 
     def test_add_set_sequence(self):
@@ -100,7 +98,7 @@ class TestProductSet(common.SavepointCase):
             self.env.ref("sale_product_set.product_set_line_computer_3").product_id
         )
         self.assertTrue(
-            max([v for k, v in sequence.items()]) < seq_line1 < seq_line2 < seq_line3
+            max(v for k, v in sequence.items()) < seq_line1 < seq_line2 < seq_line3
         )
 
     def test_delete_set(self):
@@ -168,7 +166,8 @@ class TestProductSet(common.SavepointCase):
         partner = self.env.ref("base.res_partner_1")
         product_set.partner_id = partner
         self.assertEqual(
-            product_set.name_get(), [(product_set.id, "[123] Foo @ %s" % partner.name)]
+            product_set.name_get(),
+            [(product_set.id, f"[123] Foo @ {partner.name}")],
         )
 
     def test_discount(self):

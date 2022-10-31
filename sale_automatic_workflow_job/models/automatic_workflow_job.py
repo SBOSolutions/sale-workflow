@@ -28,9 +28,9 @@ class AutomaticWorkflowJob(models.Model):
         if not self.env["sale.order"].search_count(
             [("id", "=", sale.id)] + domain_filter
         ):
-            return "{} {} job bypassed".format(sale.display_name, sale)
+            return f"{sale.display_name} {sale} job bypassed"
         super()._do_validate_sale_order(sale, domain_filter)
-        return "{} {} confirmed successfully".format(sale.display_name, sale)
+        return f"{sale.display_name} {sale} confirmed successfully"
 
     def _do_send_order_confirmation_mail(self, sale):
         """Filtering to make sure the order is confirmed with
@@ -40,11 +40,9 @@ class AutomaticWorkflowJob(models.Model):
         if not self.env["sale.order"].search_count(
             [("id", "=", sale.id), ("state", "=", "sale")]
         ):
-            return "{} {} job bypassed".format(sale.display_name, sale)
+            return f"{sale.display_name} {sale} job bypassed"
         super()._do_send_order_confirmation_mail(sale)
-        return "{} {} send order confirmation mail successfully".format(
-            sale.display_name, sale
-        )
+        return f"{sale.display_name} {sale} send order confirmation mail successfully"
 
     def _do_create_invoice_job_options(self, sale, domain_filter):
         description = _("Create invoices for sales order {}").format(sale.display_name)
@@ -64,9 +62,9 @@ class AutomaticWorkflowJob(models.Model):
         if not self.env["sale.order"].search_count(
             [("id", "=", sale.id)] + domain_filter
         ):
-            return "{} {} job bypassed".format(sale.display_name, sale)
+            return f"{sale.display_name} {sale} job bypassed"
         super()._do_create_invoice(sale, domain_filter)
-        return "{} {} create invoice successfully".format(sale.display_name, sale)
+        return f"{sale.display_name} {sale} create invoice successfully"
 
     def _do_validate_invoice_job_options(self, invoice, domain_filter):
         description = _("Validate invoice {}").format(invoice.display_name)
@@ -88,11 +86,9 @@ class AutomaticWorkflowJob(models.Model):
         if not self.env["account.move"].search_count(
             [("id", "=", invoice.id)] + domain_filter
         ):
-            return "{} {} job bypassed".format(invoice.display_name, invoice)
+            return f"{invoice.display_name} {invoice} job bypassed"
         super()._do_validate_invoice(invoice, domain_filter)
-        return "{} {} validate invoice successfully".format(
-            invoice.display_name, invoice
-        )
+        return f"{invoice.display_name} {invoice} validate invoice successfully"
 
     def _do_validate_picking_job_options(self, picking, domain_filter):
         description = _("Validate transfer {}").format(picking.display_name)
@@ -114,11 +110,9 @@ class AutomaticWorkflowJob(models.Model):
         if not self.env["stock.picking"].search_count(
             [("id", "=", picking.id)] + domain_filter
         ):
-            return "{} {} job bypassed".format(picking.display_name, picking)
+            return f"{picking.display_name} {picking} job bypassed"
         super()._do_validate_picking(picking, domain_filter)
-        return "{} {} validate picking successfully".format(
-            picking.display_name, picking
-        )
+        return f"{picking.display_name} {picking} validate picking successfully"
 
     def _do_sale_done_job_options(self, sale, domain_filter):
         description = _("Mark sales order {} as done").format(sale.display_name)
@@ -138,9 +132,9 @@ class AutomaticWorkflowJob(models.Model):
         if not self.env["sale.order"].search_count(
             [("id", "=", sale.id)] + domain_filter
         ):
-            return "{} {} job bypassed".format(sale.display_name, sale)
+            return f"{sale.display_name} {sale} job bypassed"
         super()._do_sale_done(sale, domain_filter)
-        return "{} {} set done successfully".format(sale.display_name, sale)
+        return f"{sale.display_name} {sale} set done successfully"
 
     def _register_hook(self):
         mapping = {

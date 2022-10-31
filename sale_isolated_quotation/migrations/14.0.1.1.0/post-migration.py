@@ -22,7 +22,7 @@ def _remove_extra_sequence(cr):
     ids = [rec["id"] for rec in cr.dictfetchall()]
     if not ids:
         return
-    _logger.info("Remove unnecessary sale.quotation ir_sequence " + str(ids))
+    _logger.info(f"Remove unnecessary sale.quotation ir_sequence {ids}")
     env = api.Environment(cr, 1, {})
     seqs = env["ir.sequence"].browse(ids)
     seqs.unlink()

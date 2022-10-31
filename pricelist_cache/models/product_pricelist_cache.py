@@ -81,13 +81,12 @@ class PricelistCache(models.Model):
             - product_ids : A list of product ids to cache
             - product_prices : A dict containing the prices for each product
         """
-        values = [
+        if values := [
             sql.SQL(", ").join(
                 map(sql.Literal, (p_id, pricelist_id, product_prices[p_id]))
             )
             for p_id in product_ids
-        ]
-        if values:
+        ]:
             # create_everything from a single transaction
             query = sql.SQL(
                 """
@@ -162,15 +161,12 @@ class PricelistCache(models.Model):
         """
         if not product_ids:
             product_ids = self.env["product.product"].search([]).ids
-        if not pricelist_ids:
-            pricelists = self.env["product.pricelist"].search([])
-        else:
-            # Search instead of browse, since pricelists could have been unlinked
-            # between the time where records have been created / modified
-            # and the time this method is executed.
-            pricelists = self.env["product.pricelist"].search(
-                [("id", "in", pricelist_ids)]
-            )
+        pricelists = (
+            self.env["product.pricelist"].search([("id", "in", pricelist_ids)])
+            if pricelist_ids
+            else self.env["product.pricelist"].search([])
+        )
+
         for pricelist in pricelists:
             product_ids_to_update = self._get_product_ids_to_update(
                 pricelist, product_ids

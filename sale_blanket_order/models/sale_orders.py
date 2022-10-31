@@ -38,14 +38,16 @@ class SaleOrder(models.Model):
     @api.constrains("partner_id")
     def check_partner_id(self):
         for line in self.order_line:
-            if line.blanket_order_line:
-                if line.blanket_order_line.partner_id != self.partner_id:
-                    raise ValidationError(
-                        _(
-                            "The customer must be equal to the "
-                            "blanket order lines customer"
-                        )
+            if (
+                line.blanket_order_line
+                and line.blanket_order_line.partner_id != self.partner_id
+            ):
+                raise ValidationError(
+                    _(
+                        "The customer must be equal to the "
+                        "blanket order lines customer"
                     )
+                )
 
 
 class SaleOrderLine(models.Model):
@@ -68,8 +70,7 @@ class SaleOrderLine(models.Model):
                 date_delta = abs(date_schedule - date_planned)
         if assigned_bo_line:
             return assigned_bo_line
-        non_date_bo_lines = bo_lines.filtered(lambda l: not l.date_schedule)
-        if non_date_bo_lines:
+        if non_date_bo_lines := bo_lines.filtered(lambda l: not l.date_schedule):
             return non_date_bo_lines[0]
 
     def _get_eligible_bo_lines_domain(self, base_qty):
@@ -120,8 +121,7 @@ class SaleOrderLine(models.Model):
 
     @api.onchange("blanket_order_line")
     def onchange_blanket_order_line(self):
-        bol = self.blanket_order_line
-        if bol:
+        if bol := self.blanket_order_line:
             self.product_id = bol.product_id
             if bol.product_uom != self.product_uom:
                 price_unit = bol.product_uom._compute_price(
@@ -154,11 +154,14 @@ class SaleOrderLine(models.Model):
     @api.constrains("currency_id")
     def check_currency(self):
         for line in self:
-            if line.blanket_order_line:
-                if line.currency_id != line.blanket_order_line.order_id.currency_id:
-                    raise ValidationError(
-                        _(
-                            "The currency of the blanket order must match with "
-                            "that of the sale order."
-                        )
+            if (
+                line.blanket_order_line
+                and line.currency_id
+                != line.blanket_order_line.order_id.currency_id
+            ):
+                raise ValidationError(
+                    _(
+                        "The currency of the blanket order must match with "
+                        "that of the sale order."
                     )
+                )

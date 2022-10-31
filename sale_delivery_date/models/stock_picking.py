@@ -108,10 +108,7 @@ class StockPicking(models.Model):
         )
         rows = self.env.cr.fetchall()
         picking_ids = [row[0] for row in rows]
-        if operator == "=":
-            new_operator = "in"
-        else:
-            new_operator = "not in"
+        new_operator = "in" if operator == "=" else "not in"
         return [("id", new_operator, picking_ids)]
 
     @api.depends("location_id")
@@ -128,8 +125,7 @@ class StockPicking(models.Model):
 
     def _planned_delivery_date(self):
         res = super()._planned_delivery_date()
-        sec_lead_time = self.company_id.security_lead
-        if sec_lead_time:
+        if sec_lead_time := self.company_id.security_lead:
             res += timedelta(days=sec_lead_time)
         return self.scheduled_date
 
@@ -137,8 +133,7 @@ class StockPicking(models.Model):
     def _onchange_scheduled_date(self):
         res = super()._onchange_scheduled_date()
         if res and "warning" in res:
-            sec_lead_time = self.company_id.security_lead
-            if sec_lead_time:
+            if sec_lead_time := self.company_id.security_lead:
                 res["warning"]["message"] += (
                     _(
                         "\nConsidering the security lead time of %s days defined on "

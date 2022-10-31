@@ -29,15 +29,13 @@ class SaleOrder(models.Model):
     )
     def _compute_invoice_amount(self):
         for rec in self:
+            rec.invoiced_amount = 0.0
             if rec.state != "cancel" and rec.invoice_ids:
-                rec.invoiced_amount = 0.0
                 for invoice in rec.invoice_ids:
                     if invoice.state != "cancel":
                         rec.invoiced_amount += invoice.amount_total_signed
                 rec.uninvoiced_amount = max(0, rec.amount_total - rec.invoiced_amount)
+            elif rec.state in ["draft", "sent", "cancel"]:
+                rec.uninvoiced_amount = 0.0
             else:
-                rec.invoiced_amount = 0.0
-                if rec.state in ["draft", "sent", "cancel"]:
-                    rec.uninvoiced_amount = 0.0
-                else:
-                    rec.uninvoiced_amount = rec.amount_total
+                rec.uninvoiced_amount = rec.amount_total

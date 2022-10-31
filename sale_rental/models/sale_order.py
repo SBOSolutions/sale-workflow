@@ -159,16 +159,16 @@ class SaleOrderLine(models.Model):
         return {"start_order_line_id": self.id}
 
     def _prepare_new_rental_procurement_values(self, group=False):
-        vals = {
+        return {
             "company_id": self.order_id.company_id,
             "group_id": group,
             "sale_line_id": self.id,
             "date_planned": self.start_date,
-            "route_ids": self.route_id or self.order_id.warehouse_id.rental_route_id,
+            "route_ids": self.route_id
+            or self.order_id.warehouse_id.rental_route_id,
             "warehouse_id": self.order_id.warehouse_id or False,
             "partner_id": self.order_id.partner_shipping_id.id,
         }
-        return vals
 
     def _run_rental_procurement(self, vals):
         self.ensure_one()
@@ -236,11 +236,9 @@ class SaleOrderLine(models.Model):
         if errors:
             raise UserError("\n".join(errors))
 
-        # call super() at the end, to make procurement_jit work
-        res = super()._action_launch_stock_rule(
+        return super()._action_launch_stock_rule(
             previous_product_uom_qty=previous_product_uom_qty
         )
-        return res
 
     def _prepare_procurement_values(self, group_id=False):
         """
@@ -257,65 +255,57 @@ class SaleOrderLine(models.Model):
     @api.onchange("product_id", "rental_qty")
     def rental_product_id_change(self):
         res = {}
-        if self.product_id:
-            if self.product_id.rented_product_id:
-                self.rental = True
-                self.can_sell_rental = False
-                self.sell_rental_id = False
-                if not self.rental_type:
-                    self.rental_type = "new_rental"
-                elif (
-                    self.rental_type == "new_rental"
-                    and self.rental_qty
-                    and self.order_id.warehouse_id
-                ):
-                    product_uom = self.product_id.rented_product_id.uom_id
-                    warehouse = self.order_id.warehouse_id
-                    rental_in_location = warehouse.rental_in_location_id
-                    rented_product_ctx = self.with_context(
-                        location=rental_in_location.id
-                    ).product_id.rented_product_id
-                    in_location_available_qty = (
-                        rented_product_ctx.qty_available
-                        - rented_product_ctx.outgoing_qty
-                    )
-                    compare_qty = float_compare(
-                        in_location_available_qty,
-                        self.rental_qty,
-                        precision_rounding=product_uom.rounding,
-                    )
-                    if compare_qty == -1:
-                        res["warning"] = {
-                            "title": _("Not enough stock !"),
-                            "message": _(
-                                "You want to rent %.2f %s but you only "
-                                "have %.2f %s currently available on the "
-                                "stock location '%s' ! Make sure that you "
-                                "get some units back in the mean time or "
-                                "re-supply the stock location '%s'."
-                            )
-                            % (
-                                self.rental_qty,
-                                product_uom.name,
-                                in_location_available_qty,
-                                product_uom.name,
-                                rental_in_location.name,
-                                rental_in_location.name,
-                            ),
-                        }
-            elif self.product_id.rental_service_ids:
-                self.can_sell_rental = True
-                self.rental = False
-                self.rental_type = False
-                self.rental_qty = 0
-                self.extension_rental_id = False
-            else:
-                self.rental_type = False
-                self.rental = False
-                self.rental_qty = 0
-                self.extension_rental_id = False
-                self.can_sell_rental = False
-                self.sell_rental_id = False
+        if self.product_id and self.product_id.rented_product_id:
+            self.rental = True
+            self.can_sell_rental = False
+            self.sell_rental_id = False
+            if not self.rental_type:
+                self.rental_type = "new_rental"
+            elif (
+                self.rental_type == "new_rental"
+                and self.rental_qty
+                and self.order_id.warehouse_id
+            ):
+                product_uom = self.product_id.rented_product_id.uom_id
+                warehouse = self.order_id.warehouse_id
+                rental_in_location = warehouse.rental_in_location_id
+                rented_product_ctx = self.with_context(
+                    location=rental_in_location.id
+                ).product_id.rented_product_id
+                in_location_available_qty = (
+                    rented_product_ctx.qty_available
+                    - rented_product_ctx.outgoing_qty
+                )
+                compare_qty = float_compare(
+                    in_location_available_qty,
+                    self.rental_qty,
+                    precision_rounding=product_uom.rounding,
+                )
+                if compare_qty == -1:
+                    res["warning"] = {
+                        "title": _("Not enough stock !"),
+                        "message": _(
+                            "You want to rent %.2f %s but you only "
+                            "have %.2f %s currently available on the "
+                            "stock location '%s' ! Make sure that you "
+                            "get some units back in the mean time or "
+                            "re-supply the stock location '%s'."
+                        )
+                        % (
+                            self.rental_qty,
+                            product_uom.name,
+                            in_location_available_qty,
+                            product_uom.name,
+                            rental_in_location.name,
+                            rental_in_location.name,
+                        ),
+                    }
+        elif self.product_id and self.product_id.rental_service_ids:
+            self.can_sell_rental = True
+            self.rental = False
+            self.rental_type = False
+            self.rental_qty = 0
+            self.extension_rental_id = False
         else:
             self.rental_type = False
             self.rental = False
