@@ -74,11 +74,9 @@ class TestSaleProcurementAmendment(common.SavepointCase):
             len(self.order.picking_ids),
         )
         self.assertTrue(
-            all(
-                value
-                for value in self.order.picking_ids.move_lines.mapped("can_be_amended")
-            )
+            all(self.order.picking_ids.move_lines.mapped("can_be_amended"))
         )
+
         self.assertFalse(
             self.sale_line.pickings_in_progress,
         )
@@ -99,15 +97,9 @@ class TestSaleProcurementAmendment(common.SavepointCase):
         self.order.picking_ids.move_line_ids.qty_done = 1.0
         self.order.picking_ids.move_lines.invalidate_cache()
         self.assertTrue(
-            all(
-                [
-                    not value
-                    for value in self.order.picking_ids.move_lines.mapped(
-                        "can_be_amended"
-                    )
-                ]
-            )
+            not any(self.order.picking_ids.move_lines.mapped("can_be_amended"))
         )
+
         self.assertTrue(
             self.sale_line.pickings_in_progress,
         )
@@ -334,11 +326,9 @@ class TestSaleProcurementAmendment(common.SavepointCase):
             len(self.order.picking_ids),
         )
         self.assertTrue(
-            all(
-                value
-                for value in self.order.picking_ids.move_lines.mapped("can_be_amended")
-            )
+            all(self.order.picking_ids.move_lines.mapped("can_be_amended"))
         )
+
         self.assertFalse(
             self.sale_line.pickings_in_progress,
         )
@@ -348,11 +338,9 @@ class TestSaleProcurementAmendment(common.SavepointCase):
 
         self.order.picking_ids.with_context(cancel_backorder=True)._action_done()
         self.assertFalse(
-            all(
-                value
-                for value in self.order.picking_ids.move_lines.mapped("can_be_amended")
-            )
+            all(self.order.picking_ids.move_lines.mapped("can_be_amended"))
         )
+
         self.assertFalse(
             self.sale_line.pickings_in_progress,
         )

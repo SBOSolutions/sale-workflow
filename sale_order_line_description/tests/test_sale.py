@@ -45,7 +45,7 @@ class TestSaleOrderLineDescriptionChange(common.TransactionCase):
             {
                 "name": name,
                 "login": name,
-                "email": name + "@example.com",
+                "email": f"{name}@example.com",
                 "groups_id": groups_id,
             }
         )

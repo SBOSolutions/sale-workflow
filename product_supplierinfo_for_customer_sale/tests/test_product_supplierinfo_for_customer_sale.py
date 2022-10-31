@@ -58,7 +58,7 @@ class TestProductSupplierinfoForCustomerSale(TransactionCase):
         if empty_variant:
             vals.pop("product_id", None)
             vals["product_tmpl_id"] = product.product_tmpl_id.id
-        return self.env["product." + supplierinfo_type + "info"].create(vals)
+        return self.env[f"product.{supplierinfo_type}info"].create(vals)
 
     def _create_pricelist(self, name, product):
         return self.pricelist_model.create(

@@ -25,12 +25,11 @@ class SaleOrder(models.Model):
             "res_model": "payment.transaction",
         }
         if self.payment_transaction_count == 1:
-            action.update({"res_id": self.transaction_ids.id, "view_mode": "form"})
+            action |= {"res_id": self.transaction_ids.id, "view_mode": "form"}
         else:
-            action.update(
-                {
-                    "view_mode": "tree,form",
-                    "domain": [("id", "in", self.transaction_ids.ids)],
-                }
-            )
+            action |= {
+                "view_mode": "tree,form",
+                "domain": [("id", "in", self.transaction_ids.ids)],
+            }
+
         return action

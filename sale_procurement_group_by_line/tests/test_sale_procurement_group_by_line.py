@@ -28,14 +28,12 @@ class TestSaleProcurementGroupByLine(TransactionCase):
         self.sale = self._create_sale_order()
 
     def _create_product_category(self):
-        product_ctg = self.product_ctg_model.create({"name": "test_product_ctg"})
-        return product_ctg
+        return self.product_ctg_model.create({"name": "test_product_ctg"})
 
     def _create_product(self, name):
-        product = self.product_model.create(
+        return self.product_model.create(
             {"name": name, "categ_id": self.product_ctg.id, "type": "product"}
         )
-        return product
 
     def _create_sale_order(self):
         """Create a Sale Order."""

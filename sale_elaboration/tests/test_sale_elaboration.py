@@ -133,11 +133,12 @@ class TestSaleElaboration(SavepointCase):
         )
         self.assertEqual(
             inv_line_elaboration.name,
-            "{} - {}".format(self.order.name, so_line_elaboration.name),
+            f"{self.order.name} - {so_line_elaboration.name}",
         )
+
         self.assertNotEqual(
             inv_line_no_elaboration.name,
-            "{} - {}".format(self.order.name, so_line_no_elaboration.name),
+            f"{self.order.name} - {so_line_no_elaboration.name}",
         )
 
     def test_sale_elaboration_change_product(self):

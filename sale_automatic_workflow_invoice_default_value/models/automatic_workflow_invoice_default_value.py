@@ -49,13 +49,14 @@ class AutomaticWorkflowInvoiceDefaultValue(models.Model):
                     )
             else:  # record.value_type == "from_sale_order"
                 sale_order_field_type = record.sale_order_field_id.ttype
-                if invoice_field_type != sale_order_field_type:
-                    # Special case: char and text are considered identical
-                    if invoice_field_type in [
+                if invoice_field_type != sale_order_field_type and (
+                    invoice_field_type
+                    not in [
                         "char",
                         "text",
-                    ] and sale_order_field_type in ["char", "text"]:
-                        continue
+                    ]
+                    or sale_order_field_type not in ["char", "text"]
+                ):
                     raise ValidationError(
                         _(
                             "With a from sale order value, the invoice field "

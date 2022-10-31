@@ -50,10 +50,9 @@ class ProductSetAdd(models.TransientModel):
             if rec.product_set_line_ids:
                 # Passed on creation
                 continue
-            lines = lines_from_ctx.filtered(
+            if lines := lines_from_ctx.filtered(
                 lambda x: x.product_set_id == rec.product_set_id
-            )
-            if lines:
+            ):
                 # Use the ones from ctx but make sure they belong to the same set.
                 rec.product_set_line_ids = lines
             else:
@@ -78,8 +77,7 @@ class ProductSetAdd(models.TransientModel):
 
     def _allowed_order_partners(self):
         """Product sets' partners allowed for current sale order."""
-        partner_ids = self.env.context.get("allowed_order_partner_ids")
-        if partner_ids:
+        if partner_ids := self.env.context.get("allowed_order_partner_ids"):
             return self.env["res.partner"].browse(partner_ids)
         return self.product_set_id.partner_id
 
@@ -105,10 +103,11 @@ class ProductSetAdd(models.TransientModel):
         return order_lines
 
     def _get_max_sequence(self):
-        max_sequence = 0
-        if self.order_id.order_line:
-            max_sequence = max([line.sequence for line in self.order_id.order_line])
-        return max_sequence
+        return (
+            max(line.sequence for line in self.order_id.order_line)
+            if self.order_id.order_line
+            else 0
+        )
 
     def _get_lines(self):
         # hook here to take control on used lines

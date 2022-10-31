@@ -23,11 +23,10 @@ class SaleOrder(models.Model):
         self.ensure_one()
         res = self._common_action_keys()
         res["context"].update(self._get_context_add_products())
-        domain = self._get_domain_add_products()
-        if domain:
+        if domain := self._get_domain_add_products():
             res["domain"] = domain
         commercial = self.partner_id.commercial_partner_id.name
-        res["name"] = "🔙 {} ({})".format(_("Product Variants"), commercial)
+        res["name"] = f'🔙 {_("Product Variants")} ({commercial})'
         res["view_id"] = (self.env.ref("sale_quick.product_tree_view4sale").id,)
         return res
 

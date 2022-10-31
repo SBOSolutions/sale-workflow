@@ -285,10 +285,7 @@ class TestPricelistCache(TestPricelistCacheCommon):
             self.list0.id,
             self.env.ref("product.list0").id,
         ]
-        # This pricelist is created when stock module is installed. No other
-        # way is found yet to identify it.
-        pl = pricelist_model.search([("name", "=", "Default USD pricelist")])
-        if pl:
+        if pl := pricelist_model.search([("name", "=", "Default USD pricelist")]):
             expected_root_pricelist_ids.append(pl.id)
         expected_root_pricelist_ids.sort()
         root_pricelist_ids = pricelist_model._get_root_pricelist_ids()

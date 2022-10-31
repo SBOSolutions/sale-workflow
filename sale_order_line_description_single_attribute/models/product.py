@@ -13,10 +13,9 @@ class ProductTemplateAttributeValue(models.Model):
     _inherit = "product.template.attribute.value"
 
     def _get_combination_name(self):
-        if self.env.context.get("include_single_value"):
-            ptavs = self._without_no_variant_attributes().with_prefetch(
-                self._prefetch_ids
-            )
-            return ", ".join([ptav.name for ptav in ptavs])
-        else:
+        if not self.env.context.get("include_single_value"):
             return super(ProductTemplateAttributeValue, self)._get_combination_name()
+        ptavs = self._without_no_variant_attributes().with_prefetch(
+            self._prefetch_ids
+        )
+        return ", ".join([ptav.name for ptav in ptavs])

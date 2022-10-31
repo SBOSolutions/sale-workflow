@@ -63,7 +63,7 @@ class BlanketOrderWizard(models.TransientModel):
 
         self._check_valid_blanket_order_line(bo_lines)
 
-        lines = [
+        return [
             (
                 0,
                 0,
@@ -80,7 +80,6 @@ class BlanketOrderWizard(models.TransientModel):
             )
             for bol in bo_lines.filtered(lambda l: l.remaining_uom_qty != 0.0)
         ]
-        return lines
 
     blanket_order_id = fields.Many2one(
         comodel_name="sale.blanket.order",

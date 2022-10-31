@@ -356,47 +356,37 @@ class BlanketOrder(models.Model):
     @api.model
     def _search_original_uom_qty(self, operator, value):
         bo_line_obj = self.env["sale.blanket.order.line"]
-        res = []
         bo_lines = bo_line_obj.search([("original_uom_qty", operator, value)])
         order_ids = bo_lines.mapped("order_id")
-        res.append(("id", "in", order_ids.ids))
-        return res
+        return [("id", "in", order_ids.ids)]
 
     @api.model
     def _search_ordered_uom_qty(self, operator, value):
         bo_line_obj = self.env["sale.blanket.order.line"]
-        res = []
         bo_lines = bo_line_obj.search([("ordered_uom_qty", operator, value)])
         order_ids = bo_lines.mapped("order_id")
-        res.append(("id", "in", order_ids.ids))
-        return res
+        return [("id", "in", order_ids.ids)]
 
     @api.model
     def _search_invoiced_uom_qty(self, operator, value):
         bo_line_obj = self.env["sale.blanket.order.line"]
-        res = []
         bo_lines = bo_line_obj.search([("invoiced_uom_qty", operator, value)])
         order_ids = bo_lines.mapped("order_id")
-        res.append(("id", "in", order_ids.ids))
-        return res
+        return [("id", "in", order_ids.ids)]
 
     @api.model
     def _search_delivered_uom_qty(self, operator, value):
         bo_line_obj = self.env["sale.blanket.order.line"]
-        res = []
         bo_lines = bo_line_obj.search([("delivered_uom_qty", operator, value)])
         order_ids = bo_lines.mapped("order_id")
-        res.append(("id", "in", order_ids.ids))
-        return res
+        return [("id", "in", order_ids.ids)]
 
     @api.model
     def _search_remaining_uom_qty(self, operator, value):
         bo_line_obj = self.env["sale.blanket.order.line"]
-        res = []
         bo_lines = bo_line_obj.search([("remaining_uom_qty", operator, value)])
         order_ids = bo_lines.mapped("order_id")
-        res.append(("id", "in", order_ids.ids))
-        return res
+        return [("id", "in", order_ids.ids)]
 
 
 class BlanketOrderLine(models.Model):
@@ -502,21 +492,18 @@ class BlanketOrderLine(models.Model):
     )
 
     def name_get(self):
+        if not self.env.context.get("from_sale_order"):
+            return super().name_get()
         result = []
-        if self.env.context.get("from_sale_order"):
-            for record in self:
-                res = "[%s]" % record.order_id.name
-                if record.date_schedule:
-                    formatted_date = format_date(record.env, record.date_schedule)
-                    res += " - {}: {}".format(_("Date Scheduled"), formatted_date)
-                res += " ({}: {} {})".format(
-                    _("remaining"),
-                    record.remaining_uom_qty,
-                    record.product_uom.name,
-                )
-                result.append((record.id, res))
-            return result
-        return super().name_get()
+        for record in self:
+            res = f"[{record.order_id.name}]"
+            if record.date_schedule:
+                formatted_date = format_date(record.env, record.date_schedule)
+                res += f' - {_("Date Scheduled")}: {formatted_date}'
+            res += f' ({_("remaining")}: {record.remaining_uom_qty} {record.product_uom.name})'
+
+            result.append((record.id, res))
+        return result
 
     def _get_real_price_currency(self, product, rule_id, qty, uom, pricelist_id):
         """Retrieve the price before applying the pricelist
@@ -563,13 +550,12 @@ class BlanketOrderLine(models.Model):
         if not currency_id:
             currency_id = product_currency
             cur_factor = 1.0
+        elif currency_id.id == product_currency.id:
+            cur_factor = 1.0
         else:
-            if currency_id.id == product_currency.id:
-                cur_factor = 1.0
-            else:
-                cur_factor = currency_id._get_conversion_rate(
-                    product_currency, currency_id
-                )
+            cur_factor = currency_id._get_conversion_rate(
+                product_currency, currency_id
+            )
 
         product_uom = product.uom_id.id
         if uom and uom.id != product_uom:
@@ -624,7 +610,7 @@ class BlanketOrderLine(models.Model):
             ):
                 self.price_unit = self._get_display_price(self.product_id)
             if self.product_id.code:
-                name = "[{}] {}".format(name, self.product_id.code)
+                name = f"[{name}] {self.product_id.code}"
             if self.product_id.description_sale:
                 name += "\n" + self.product_id.description_sale
             self.name = name

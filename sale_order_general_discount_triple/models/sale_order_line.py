@@ -42,13 +42,12 @@ class SaleOrderLine(models.Model):
     @api.model
     def create(self, vals):
         sale_order = self.env["sale.order"].browse(vals["order_id"])
-        general_discount = (
+        if general_discount := (
             self.env["ir.config_parameter"]
             .sudo()
             .get_param(
                 "sale_order_general_discount_triple.general_discount", "discount"
             )
-        )
-        if general_discount:
+        ):
             vals[general_discount] = sale_order.general_discount
         return super().create(vals)

@@ -66,7 +66,7 @@ class TestPricelistCache(TestPricelistCacheCommon):
         with MockRequest(self.env) as mocked_request:
             mocked_request.httprequest = httprequest or mocked_request.httprequest
             headers = {}
-            headers.update(extra_headers or {})
+            headers |= (extra_headers or {})
             mocked_request.httprequest.headers = headers
             mocked_request.auth_api_key_id = self.api_key.id
             mocked_request.make_response = lambda data, **kw: data

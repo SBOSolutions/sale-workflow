@@ -40,7 +40,7 @@ class TestAutomaticWorkflowMixin(object):
             "workflow_process_id": workflow.id,
         }
         if override:
-            values.update(override)
+            values |= override
         order = sale_obj.create(values)
         # Create inventory for add stock qty to lines
         # With this commit https://goo.gl/fRTLM3 the moves that where
@@ -49,7 +49,7 @@ class TestAutomaticWorkflowMixin(object):
             if line.product_id.type == "product":
                 inventory = self.env["stock.inventory"].create(
                     {
-                        "name": "Inventory for move %s" % line.name,
+                        "name": f"Inventory for move {line.name}",
                         "line_ids": [
                             (
                                 0,
@@ -65,6 +65,7 @@ class TestAutomaticWorkflowMixin(object):
                         ],
                     }
                 )
+
                 inventory.action_start()
                 inventory.action_validate()
         return order

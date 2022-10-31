@@ -133,27 +133,19 @@ class SaleOrderLine(models.Model):
 
     @api.onchange("end_date")
     def end_date_change(self):
-        if self.end_date:
-            if self.start_date and self.start_date > self.end_date:
-                self.start_date = self.end_date
+        if self.end_date and self.start_date and self.start_date > self.end_date:
+            self.start_date = self.end_date
 
     @api.onchange("start_date")
     def start_date_change(self):
-        if self.start_date:
-            if self.end_date and self.start_date > self.end_date:
-                self.end_date = self.start_date
+        if self.start_date and self.end_date and self.start_date > self.end_date:
+            self.end_date = self.start_date
 
     @api.onchange("product_id")
     def start_end_dates_product_id_change(self):
         if self.product_id.must_have_dates:
-            if self.order_id.default_start_date:
-                self.start_date = self.order_id.default_start_date
-            else:
-                self.start_date = False
-            if self.order_id.default_end_date:
-                self.end_date = self.order_id.default_end_date
-            else:
-                self.end_date = False
+            self.start_date = self.order_id.default_start_date or False
+            self.end_date = self.order_id.default_end_date or False
         else:
             self.start_date = False
             self.end_date = False

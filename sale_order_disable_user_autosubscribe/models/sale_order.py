@@ -18,8 +18,7 @@ class SaleOrder(models.Model):
         res = super()._message_auto_subscribe_followers(
             updated_values, default_subtype_ids
         )
-        user_id = updated_values.get("user_id")
-        if user_id:
+        if user_id := updated_values.get("user_id"):
             user = self.env["res.users"].browse(user_id)
             partner = user.partner_id
             res = [follower for follower in res if follower[0] != partner.id]

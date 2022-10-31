@@ -11,9 +11,9 @@ class SaleOrder(models.Model):
 
     @api.depends("order_line.price_total")
     def _amount_all(self):
-        prev_values = dict()
+        prev_values = {}
         for order in self:
-            prev_values.update(order.order_line.triple_discount_preprocess())
+            prev_values |= order.order_line.triple_discount_preprocess()
         super()._amount_all()
         self.env["sale.order.line"].triple_discount_postprocess(prev_values)
 
@@ -36,5 +36,4 @@ class SaleOrder(models.Model):
                     if t["id"] == tax.id or t["id"] in tax.children_tax_ids.ids:
                         res[group] += t["amount"]
         res = sorted(list(res.items()), key=lambda l: l[0].sequence)
-        res = [(line[0].name, line[1]) for line in res]
-        return res
+        return [(line[0].name, line[1]) for line in res]

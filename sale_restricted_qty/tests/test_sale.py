@@ -54,8 +54,7 @@ class TestSaleOrderLineMinQty(common.TransactionCase):
         sale_order.order_line.product_id_change()
         sale_order.order_line._compute_is_qty_less_min_qty()
         sale_order.order_line._compute_is_qty_bigger_max_qty()
-        sale_values = sale_order._convert_to_write(sale_order._cache)
-        return sale_values
+        return sale_order._convert_to_write(sale_order._cache)
 
     def test_check_sale_order_min_qty_required(self):
         line_values = {"product_id": self.product.id, "product_uom_qty": 5.0}

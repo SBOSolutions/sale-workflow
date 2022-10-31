@@ -39,8 +39,7 @@ class SaleOrder(models.Model):
         )
         if view_type == "form":
             order_xml = etree.XML(res["arch"])
-            order_line_fields = order_xml.xpath("//field[@name='order_line']")
-            if order_line_fields:
+            if order_line_fields := order_xml.xpath("//field[@name='order_line']"):
                 order_line_field = order_line_fields[0]
                 context = order_line_field.attrib.get("context", "{}").replace(
                     "{",

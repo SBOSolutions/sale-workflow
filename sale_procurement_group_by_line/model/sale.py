@@ -53,8 +53,7 @@ class SaleOrderLine(models.Model):
             # according to the group key
             group_id = line.procurement_group_id or False
             for order_line in line.order_id.order_line:
-                g_id = order_line.procurement_group_id or False
-                if g_id:
+                if g_id := order_line.procurement_group_id or False:
                     groups[order_line._get_procurement_group_key()] = g_id
             if not group_id:
                 group_id = groups.get(line._get_procurement_group_key())
@@ -75,11 +74,9 @@ class SaleOrderLine(models.Model):
                 # of the group.
                 updated_vals = {}
                 if group_id.partner_id != line.order_id.partner_shipping_id:
-                    updated_vals.update(
-                        {"partner_id": line.order_id.partner_shipping_id.id}
-                    )
+                    updated_vals["partner_id"] = line.order_id.partner_shipping_id.id
                 if group_id.move_type != line.order_id.picking_policy:
-                    updated_vals.update({"move_type": line.order_id.picking_policy})
+                    updated_vals["move_type"] = line.order_id.picking_policy
                 if updated_vals:
                     group_id.write(updated_vals)
             line.procurement_group_id = group_id
@@ -94,8 +91,7 @@ class SaleOrderLine(models.Model):
             )
 
             try:
-                procurements = []
-                procurements.append(
+                procurements = [
                     self.env["procurement.group"].Procurement(
                         line.product_id,
                         product_qty,
@@ -106,7 +102,8 @@ class SaleOrderLine(models.Model):
                         line.order_id.company_id,
                         values,
                     )
-                )
+                ]
+
                 self.env["procurement.group"].run(procurements)
                 # We store the procured quantity in the UoM of the line to avoid
                 # duplicated procurements, specially for dropshipping and kits.

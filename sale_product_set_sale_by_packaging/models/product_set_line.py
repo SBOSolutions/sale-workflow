@@ -20,10 +20,10 @@ class ProductSetLine(models.Model):
     # non-store, non-inherit so not writeable
     @api.constrains("sell_only_by_packaging", "product_packaging_id")
     def _check_sell_only_by_packaging(self):
-        errored = self.filtered(
-            lambda x: x.product_id.sell_only_by_packaging and not x.product_packaging_id
-        )
-        if errored:
+        if errored := self.filtered(
+            lambda x: x.product_id.sell_only_by_packaging
+            and not x.product_packaging_id
+        ):
             raise exceptions.UserError(
                 self._check_sell_only_by_packaging_err_msg(errored)
             )

@@ -33,9 +33,13 @@ class SaleOrder(models.Model):
         if res and "warning" in res:
             return res
         ps = self.partner_shipping_id
-        if ps and self.commitment_date and ps.delivery_time_preference != "anytime":
-            if not ps.is_in_delivery_window(self.commitment_date):
-                return {"warning": self._commitment_date_no_delivery_window_match_msg()}
+        if (
+            ps
+            and self.commitment_date
+            and ps.delivery_time_preference != "anytime"
+            and not ps.is_in_delivery_window(self.commitment_date)
+        ):
+            return {"warning": self._commitment_date_no_delivery_window_match_msg()}
 
     def _commitment_date_no_delivery_window_match_msg(self):
         ps = self.partner_shipping_id
@@ -53,8 +57,9 @@ class SaleOrder(models.Model):
                 "time windows:\n%s"
             ) % (
                 format_datetime(self.env, self.commitment_date),
-                "\n".join(["  * %s" % w.display_name for w in windows]),
+                "\n".join([f"  * {w.display_name}" for w in windows]),
             )
+
         return {
             "title": _(
                 "Commitment date does not match shipping "

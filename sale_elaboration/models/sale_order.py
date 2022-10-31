@@ -22,10 +22,9 @@ class SaleOrder(models.Model):
         :return: the sale order line record created
         """
         SaleOrderLine = self.env["sale.order.line"]
-        sol_for_product = self.order_line.filtered(lambda x: x.product_id == product)[
-            :1
-        ]
-        if sol_for_product:
+        if sol_for_product := self.order_line.filtered(
+            lambda x: x.product_id == product
+        )[:1]:
             sol_for_product.product_uom_qty += qty
             return sol_for_product
         sol = SaleOrderLine.new(
@@ -68,7 +67,7 @@ class SaleOrderLine(models.Model):
     def _prepare_invoice_line(self, **optional_values):
         vals = super()._prepare_invoice_line(**optional_values)
         if self.is_elaboration:
-            vals["name"] = "{} - {}".format(self.order_id.name, self.name)
+            vals["name"] = f"{self.order_id.name} - {self.name}"
         return vals
 
     @api.depends("product_id")

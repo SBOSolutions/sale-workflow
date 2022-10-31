@@ -101,7 +101,6 @@ class AccountVoucherWizard(models.TransientModel):
         self.currency_amount = amount_advance
 
     def _prepare_payment_vals(self, sale):
-        partner_id = sale.partner_invoice_id.commercial_partner_id.id
         if self.amount_advance < 0.0:
             raise UserError(
                 _(
@@ -111,6 +110,7 @@ class AccountVoucherWizard(models.TransientModel):
                 )
             )
 
+        partner_id = sale.partner_invoice_id.commercial_partner_id.id
         return {
             "date": self.date,
             "amount": self.amount_advance,
@@ -130,8 +130,7 @@ class AccountVoucherWizard(models.TransientModel):
         self.ensure_one()
         payment_obj = self.env["account.payment"]
         sale_obj = self.env["sale.order"]
-        sale_ids = self.env.context.get("active_ids", [])
-        if sale_ids:
+        if sale_ids := self.env.context.get("active_ids", []):
             sale_id = fields.first(sale_ids)
             sale = sale_obj.browse(sale_id)
             payment_vals = self._prepare_payment_vals(sale)

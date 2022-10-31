@@ -31,7 +31,7 @@ class SaleOrder(models.Model):
         if default is None:
             default = {}
         if self.origin and self.origin != "":
-            default["origin"] = self.origin + ", " + self.name
+            default["origin"] = f"{self.origin}, {self.name}"
         else:
             default["origin"] = self.name
         return super(SaleOrder, self).copy(default)
@@ -43,7 +43,7 @@ class SaleOrder(models.Model):
             if order.state not in ("draft", "sent") or order.company_id.keep_name_so:
                 continue
             if order.origin and order.origin != "":
-                quo = order.origin + ", " + order.name
+                quo = f"{order.origin}, {order.name}"
             else:
                 quo = order.name
             sequence = self.env["ir.sequence"].next_by_code("sale.order")

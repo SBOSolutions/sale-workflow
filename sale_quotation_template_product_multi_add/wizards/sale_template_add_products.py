@@ -41,11 +41,9 @@ class SaleTemplateAddProducts(models.TransientModel):
         }
 
     def select_products(self):
-        quotation_template_id = self.env.context.get("active_id", False)
-        if quotation_template_id:
+        if quotation_template_id := self.env.context.get("active_id", False):
             for item in self.item_ids:
-                vals = self._get_line_values(quotation_template_id, item)
-                if vals:
+                if vals := self._get_line_values(quotation_template_id, item):
                     self.env["sale.order.template.line"].create(vals)
         return {"type": "ir.actions.act_window_close"}
 

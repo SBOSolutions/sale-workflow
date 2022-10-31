@@ -47,8 +47,7 @@ class SaleOrder(models.Model):
         """Adapt the attrs of elements in the view."""
         doc = etree.XML(view_arch)
         self._add_commitment_date_attrs_required(doc)
-        new_view = etree.tostring(doc, encoding="unicode")
-        return new_view
+        return etree.tostring(doc, encoding="unicode")
 
     def _add_commitment_date_attrs_required(self, doc):
         xpath_expr = "//field[@name='commitment_date']"

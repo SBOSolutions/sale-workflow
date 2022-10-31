@@ -34,7 +34,7 @@ class SaleOrderLine(models.Model):
             and sol.order_id.pricelist_id.item_ids
         ):
             product = line.product_id
-            items = self.env["product.pricelist.item"].search(
+            if items := self.env["product.pricelist.item"].search(
                 [
                     ("pricelist_id", "=", line.order_id.pricelist_id.id),
                     ("compute_price", "=", "formula"),
@@ -53,8 +53,7 @@ class SaleOrderLine(models.Model):
                     ("product_id", "=", product.id),
                     ("applied_on", "=", "0_product_variant"),
                 ]
-            )
-            if items:
+            ):
                 supplierinfo = line.product_id._select_customerinfo(
                     partner=line.order_partner_id
                 )

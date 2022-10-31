@@ -65,8 +65,7 @@ class SaleOrder(models.Model):
         return result
 
     def sale_check_exception(self):
-        orders = self.filtered(lambda s: s.state == "sale")
-        if orders:
+        if orders := self.filtered(lambda s: s.state == "sale"):
             orders._check_exception()
 
     def action_confirm(self):

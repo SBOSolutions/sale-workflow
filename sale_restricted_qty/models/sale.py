@@ -52,17 +52,14 @@ class SaleOrderLine(models.Model):
     def check_constraint_restricted_qty(self):
 
         msg = ""
-        invaild_min_lines = []
         line_to_test = self.filtered(
             lambda sl: not sl.product_id.force_sale_min_qty and sl.is_qty_less_min_qty
         )
-        for line in line_to_test:
-            invaild_min_lines.append(
-                _('Product "%s": Min Quantity %s.')
-                % (line.product_id.name, line.sale_min_qty)
-            )
-
-        if invaild_min_lines:
+        if invaild_min_lines := [
+            _('Product "%s": Min Quantity %s.')
+            % (line.product_id.name, line.sale_min_qty)
+            for line in line_to_test
+        ]:
             msg += _(
                 "Check minimum order quantity for this products: * \n"
             ) + "\n ".join(invaild_min_lines)
@@ -70,17 +67,14 @@ class SaleOrderLine(models.Model):
                 "\n* If you want sell quantity less than Min Quantity"
                 ',Check "force min quatity" on product'
             )
-        invaild_max_lines = []
         line_to_test = self.filtered(
             lambda sl: not sl.product_id.force_sale_max_qty and sl.is_qty_bigger_max_qty
         )
-        for line in line_to_test:
-            invaild_max_lines.append(
-                _('Product "%s": max Quantity %s.')
-                % (line.product_id.name, line.sale_max_qty)
-            )
-
-        if invaild_max_lines:
+        if invaild_max_lines := [
+            _('Product "%s": max Quantity %s.')
+            % (line.product_id.name, line.sale_max_qty)
+            for line in line_to_test
+        ]:
             msg += _(
                 "Check maximum order quantity for this products: * \n"
             ) + "\n ".join(invaild_max_lines)
@@ -88,15 +82,12 @@ class SaleOrderLine(models.Model):
                 "\n* If you want sell quantity bigger than max Quantity"
                 ',Check "force max quatity" on product'
             )
-        invaild_multiple_lines = []
         line_to_test = self.filtered(lambda sl: sl.is_qty_not_multiple_qty)
-        for line in line_to_test:
-            invaild_multiple_lines.append(
-                _('Product "%s": multiple Quantity %s.')
-                % (line.product_id.name, line.sale_multiple_qty)
-            )
-
-        if invaild_multiple_lines:
+        if invaild_multiple_lines := [
+            _('Product "%s": multiple Quantity %s.')
+            % (line.product_id.name, line.sale_multiple_qty)
+            for line in line_to_test
+        ]:
             msg += _(
                 "Check multiple order quantity for this products: * \n"
             ) + "\n ".join(invaild_multiple_lines)
@@ -160,12 +151,16 @@ class SaleOrderLine(models.Model):
     def _get_sale_restricted_qty(self):
         """Overridable function to change qty values (ex: form stock)"""
         self.ensure_one()
-        res = {
-            "sale_min_qty": (self.product_id and self.product_id.sale_min_qty or 0),
+        return {
+            "sale_min_qty": (
+                self.product_id and self.product_id.sale_min_qty or 0
+            ),
             "force_sale_min_qty": (
                 self.product_id and self.product_id.force_sale_min_qty or False
             ),
-            "sale_max_qty": (self.product_id and self.product_id.sale_max_qty or 0),
+            "sale_max_qty": (
+                self.product_id and self.product_id.sale_max_qty or 0
+            ),
             "force_sale_max_qty": (
                 self.product_id and self.product_id.force_sale_max_qty or False
             ),
@@ -173,7 +168,6 @@ class SaleOrderLine(models.Model):
                 self.product_id and self.product_id.sale_multiple_qty or 0
             ),
         }
-        return res
 
     @api.depends("product_id")
     def _compute_sale_restricted_qty(self):

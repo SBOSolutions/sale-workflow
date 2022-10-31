@@ -31,11 +31,8 @@ class PricelistCacheWizard(models.TransientModel):
         if not pricelist:
             self.display_cache_line_ids = False
             return
-        if product:
-            products = product
-        else:
-            products = self.env["product.product"].search([])
-        if partner and not partner.property_product_pricelist == pricelist:
+        products = product or self.env["product.product"].search([])
+        if partner and partner.property_product_pricelist != pricelist:
             partner = False
         cache_model = self.env["product.pricelist.cache"]
         cache_selfs = cache_model.get_cached_prices_for_pricelist(

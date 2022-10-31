@@ -77,10 +77,9 @@ class SaleOrder(models.Model):
 
     def write(self, vals):
         if vals.get("state") == "sale" and vals.get("date_order"):
-            sales_keep_order_date = self.filtered(
+            if sales_keep_order_date := self.filtered(
                 lambda sale: sale.workflow_process_id.invoice_date_is_order_date
-            )
-            if sales_keep_order_date:
+            ):
                 new_vals = vals.copy()
                 del new_vals["date_order"]
                 res = super(SaleOrder, sales_keep_order_date).write(new_vals)

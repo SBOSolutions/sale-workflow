@@ -14,10 +14,9 @@ class SaleOrderLine(models.Model):
         priority = 24
         key = super(SaleOrderLine, self)._get_procurement_group_key()
         # Check priority
-        if key[0] < priority:
-            if self.commitment_date:
-                # group by date instead of datetime
-                return (priority, self.commitment_date.date())
+        if key[0] < priority and self.commitment_date:
+            # group by date instead of datetime
+            return (priority, self.commitment_date.date())
         return key
 
     def _prepare_procurement_values(self, group_id=False):

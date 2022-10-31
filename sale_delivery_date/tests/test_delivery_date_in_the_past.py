@@ -36,7 +36,7 @@ class TestDeliveryDateInThePast(SavepointCase):
         cls.product = cls.env.ref("product.product_product_9")
 
     def _create_order(self, partner=None):
-        order = self.env["sale.order"].create(
+        return self.env["sale.order"].create(
             {
                 "partner_id": partner.id,
                 "partner_shipping_id": partner.id,
@@ -55,7 +55,6 @@ class TestDeliveryDateInThePast(SavepointCase):
                 ],
             }
         )
-        return order
 
     def test_delivery_date_as_commitment_date(self):
         """Commitment date should be used as expected_delivery_date if

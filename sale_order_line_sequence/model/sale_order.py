@@ -25,11 +25,9 @@ class SaleOrder(models.Model):
 
     def _reset_sequence(self):
         for rec in self:
-            current_sequence = 1
-            for line in sorted(rec.order_line, key=lambda x: (x.sequence, x.id)):
+            for current_sequence, line in enumerate(sorted(rec.order_line, key=lambda x: (x.sequence, x.id)), start=1):
                 if line.sequence != current_sequence:
                     line.sequence = current_sequence
-                current_sequence += 1
 
     def write(self, line_values):
         res = super(SaleOrder, self).write(line_values)

@@ -15,8 +15,7 @@ class AutomaticWorkflowJob(models.Model):
         """
         current_invoices = sale.invoice_ids
         res = super()._do_create_invoice(sale, domain_filter)
-        created_invoices = sale.invoice_ids - current_invoices
-        if created_invoices:
+        if created_invoices := sale.invoice_ids - current_invoices:
             default_values = sale.workflow_process_id.create_invoice_default_value_ids
 
             values = {}

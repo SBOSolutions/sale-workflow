@@ -90,10 +90,7 @@ class SaleOrder(models.Model):
                 has_due_amount = float_compare(
                     amount_residual, 0.0, precision_rounding=order.currency_id.rounding
                 )
-                if has_due_amount <= 0:
-                    payment_state = "paid"
-                elif has_due_amount > 0:
-                    payment_state = "partial"
+                payment_state = "paid" if has_due_amount <= 0 else "partial"
             order.payment_line_ids = mls
             order.amount_residual = amount_residual
             order.advance_payment_status = payment_state

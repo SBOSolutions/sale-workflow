@@ -104,7 +104,7 @@ class SaleInvoicePlan(models.Model):
         percent = self.percent
         move = invoice_move.with_context({"check_move_validity": False})
         for line in move.invoice_line_ids:
-            if not len(line.sale_line_ids) >= 0:
+            if len(line.sale_line_ids) < 0:
                 raise UserError(_("No matched order line for invoice line"))
             order_line = fields.first(line.sale_line_ids)
             if order_line.is_downpayment:  # based on 1 unit

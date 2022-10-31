@@ -11,7 +11,6 @@ class StockMove(models.Model):
 
     def _get_new_picking_values(self):
         values = super()._get_new_picking_values()
-        sale = self.group_id.sale_id
-        if sale:
+        if sale := self.group_id.sale_id:
             values["workflow_process_id"] = sale.workflow_process_id.id
         return values
